@@ -5,17 +5,16 @@ from concurrent.futures import ThreadPoolExecutor
 from .base import BaseCompressor
 from ..exceptions import AuthenticationError, APIError
 from ..types import CompressedPrompt
+from .config import get_api_url
 
 class ScaleDownCompressor(BaseCompressor):
     """
     Standard ScaleDown compressor using the hosted model on API.
     """
-    # UPDATED: Correct endpoint from documentation
-    BASE_URL = "https://api.scaledown.xyz/compress/raw/"
-
     def __init__(self, target_model='gpt-4o', rate='auto', api_key=None, 
                  temperature=None, preserve_keywords=False, preserve_words=None):
         super().__init__(rate=rate, api_key=api_key)
+        self.api_url = get_api_url()
         self.target_model = target_model
         self.temperature = temperature
         self.preserve_keywords = preserve_keywords
@@ -75,7 +74,7 @@ class ScaleDownCompressor(BaseCompressor):
 
         try:
             response = requests.post(
-                 self.BASE_URL,
+                 self.api_url,
                  headers=headers,
                  json=payload
             )
