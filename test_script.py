@@ -82,7 +82,10 @@ try:
     # print("\nTesting ScaleDownCompressor...", end=" ")
     try:
         comp = sd.ScaleDownCompressor(target_model="gpt-4o")
-        res = comp.compress(context=TEST_CODE, prompt="Summarize")
+        res = comp.compress(
+            context=TEST_CODE,
+            prompt="Compress to absolute minimum characters (target 350-450). Retain only scoring-critical facts: names, dates, numbers, awards, records, achievements. Remove pronunciation, descriptors, explanations, and narrative structure. Use compact factual encoding and dense information packing. Prioritize character reduction over readability. Output only compressed factual text."
+        )
         print("Passed")
         
         metrics_dict = {
@@ -91,6 +94,9 @@ try:
             "latency_ms": 0 
         }
         print_step_details("Compressor output", res.content, metrics_dict)
+        if len(res.content) < 226:
+            print("Compressed text too shor, using original text instead")
+            res.content = TEST_CODE
     except Exception as e:
         print(f"Failed: {e}")
 
@@ -115,8 +121,15 @@ try:
         context=TEST_CODE,
         query="logic for processing",
         file_path=file_path_arg,
-        prompt="Explain logic"
+        prompt="Compress to absolute minimum characters (target 350–450). Retain only scoring-critical facts: names, dates, numbers, awards, records, achievements. Remove pronunciation, descriptors, explanations, and narrative structure. Use compact factual encoding and dense information packing. Prioritize character reduction over readability. Output only compressed factual text."
     )
+
+    print(result.final_content)
+
+    if len(result.final_content) < 226:
+        print("Pipeline output too short, using original text instead")
+        result.final_content = TEST_CODE
+    print("Final content length:", len(result.final_content))
     
     print("Pipeline finished successfully")
     
